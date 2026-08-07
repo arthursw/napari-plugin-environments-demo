@@ -2,15 +2,15 @@
 # requires-python = ">=3.12,<3.14"
 # dependencies = [
 #   "imagecodecs",
-#   "napari[optional,pyqt6] @ git+https://github.com/arthursw/napari.git@9996c7bad27add1c86a2077fc6e2987dbe463aeb",
-#   "napari-isolation-demo @ git+https://github.com/arthursw/napari-plugin-environments-demo.git@d770ef509066a90ccec167f4b75298d2e222a78a#subdirectory=plugins/napari-isolation-demo",
-#   "napari-plugin-manager @ git+https://github.com/arthursw/napari-plugin-manager.git@59950d779f357e201297b410c3a9558b4938cdf4",
+#   "napari[optional,pyqt6] @ git+https://github.com/arthursw/napari.git@demo/plugin-environments",
+#   "napari-isolation-demo @ git+https://github.com/arthursw/napari-plugin-environments-demo.git@main#subdirectory=plugins/napari-isolation-demo",
+#   "napari-plugin-manager @ git+https://github.com/arthursw/napari-plugin-manager.git@demo/plugin-environments",
 #   "npe2",
 #   "wetlands==2.3.3",
 # ]
 # [tool.uv]
 # override-dependencies = [
-#   "npe2 @ git+https://github.com/arthursw/npe2.git@892c708f6b36f383617e37d7b59bca37e4d2c1cf",
+#   "npe2 @ git+https://github.com/arthursw/npe2.git@demo/plugin-environments",
 # ]
 # ///
 

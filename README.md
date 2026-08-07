@@ -4,7 +4,8 @@ This demo explores a plugin model in which installing a conforming plugin cannot
 The plugin's napari and Qt integration stays in the napari process, while code that needs additional dependencies runs in persistent, isolated worker environments.
 Legacy plugins remain installable, but napari warns before allowing one to resolve dependencies into the napari environment.
 
-The repository includes a small plugin that runs the same operation with incompatible NumPy versions and WSegmenter as a realistic integration using Cellpose, StarDist, and SAM 2.
+The repository includes a small plugin that runs the same operation with incompatible NumPy versions.
+WSegmenter is installed separately from its own GitHub repository as a realistic integration using Cellpose, StarDist, and SAM 2.
 The prototype and demo were generated with GPT-5.6 Sol and reviewed with automated tests and manual use.
 
 ## Run the demo
@@ -14,8 +15,6 @@ Run:
 ```console
 uv run demo.py
 ```
-
-While developing from the coordinated local worktrees, run `uv run demo_local.py` instead.
 
 The launcher installs the small isolation plugin before napari starts.
 On the first launch, napari checks every declared worker environment and installs the missing ones sequentially.
@@ -42,7 +41,7 @@ Install the demo source through the Plugin Manager's explicitly unmanaged path:
 2. Paste the following requirement into the direct-install field:
 
    ```text
-   git+https://github.com/arthursw/napari-plugin-environments-demo.git@d770ef509066a90ccec167f4b75298d2e222a78a#subdirectory=plugins/napari-wsegmenter
+   git+https://github.com/arthursw/napari-wsegmenter.git@demo/plugin-environments
    ```
 
 3. Start the installation and accept the unmanaged-install warning.
@@ -108,3 +107,17 @@ uv run smoke.py
 The smoke test verifies incompatible dependencies, separate and reusable workers, arrays and nested values, progress, cancellation, structured failures, and an unchanged host environment.
 
 Managed environments provide dependency isolation, not a security sandbox.
+
+## Troubleshoot an early cached demo version
+
+An early revision briefly used numeric Git tags that `setuptools-scm` interpreted as package version `1`.
+Those tags have been deleted, but uv may retain them if it resolved that revision before the correction.
+
+Close napari and any running demo, then force uv to refresh the Git dependencies:
+
+```console
+uv run --refresh demo.py
+```
+
+Later launches can use the normal `uv run demo.py` command again.
+Fresh clones that never resolved the early tagged revision do not need this cleanup.
