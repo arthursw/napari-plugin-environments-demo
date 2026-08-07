@@ -42,7 +42,7 @@ Install the demo source through the Plugin Manager's explicitly unmanaged path:
 2. Paste the following requirement into the direct-install field:
 
    ```text
-   git+https://github.com/arthursw/napari-plugin-environments-demo.git@plugin-environments-demo-v1#subdirectory=plugins/napari-wsegmenter
+   git+https://github.com/arthursw/napari-plugin-environments-demo.git@d770ef509066a90ccec167f4b75298d2e222a78a#subdirectory=plugins/napari-wsegmenter
    ```
 
 3. Start the installation and accept the unmanaged-install warning.
