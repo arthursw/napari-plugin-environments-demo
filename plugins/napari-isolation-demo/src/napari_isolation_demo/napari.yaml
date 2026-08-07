@@ -1,0 +1,44 @@
+schema_version: 0.3.0
+name: napari-isolation-demo
+display_name: Isolation Demo
+host_dependency_policy: napari
+contributions:
+  worker_package: worker
+  environments:
+    - id: napari-isolation-demo.numpy1
+      display_name: NumPy 1.26
+      python: "==3.10.*"
+      conda:
+        - numpy==1.26.4
+      channels:
+        - conda-forge
+    - id: napari-isolation-demo.numpy2
+      display_name: NumPy 2.2
+      python: "==3.10.*"
+      conda:
+        - numpy==2.2.6
+      channels:
+        - conda-forge
+  commands:
+    - id: napari-isolation-demo.threshold_numpy1
+      title: Threshold with NumPy 1.26
+      python_name: napari_isolation_worker:threshold
+      environment: napari-isolation-demo.numpy1
+    - id: napari-isolation-demo.threshold_numpy2
+      title: Threshold with NumPy 2.2
+      python_name: napari_isolation_worker:threshold
+      environment: napari-isolation-demo.numpy2
+    - id: napari-isolation-demo.slow
+      title: Run cancellable worker
+      python_name: napari_isolation_worker:slow_operation
+      environment: napari-isolation-demo.numpy2
+    - id: napari-isolation-demo.fail
+      title: Raise worker failure
+      python_name: napari_isolation_worker:fail_operation
+      environment: napari-isolation-demo.numpy2
+    - id: napari-isolation-demo.make_widget
+      title: Make isolation demo widget
+      python_name: napari_isolation_demo:IsolationDemoWidget
+  widgets:
+    - command: napari-isolation-demo.make_widget
+      display_name: Dependency isolation demo

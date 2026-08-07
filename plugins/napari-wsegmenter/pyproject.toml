@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "napari-wsegmenter"
+version = "0.1.2"
+description = "Managed-environment segmentation example for napari."
+requires-python = ">=3.11"
+dependencies = ["napari", "numpy", "qtpy"]
+
+[project.entry-points."napari.manifest"]
+napari-wsegmenter = "napari_wsegmenter:napari.yaml"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+napari_wsegmenter = [
+  "*.yaml",
+  "worker/pyproject.toml",
+  "worker/*.py",
+]
