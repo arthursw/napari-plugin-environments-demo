@@ -9,7 +9,7 @@ The prototype and demo were generated with GPT-5.6 Sol and reviewed with automat
 
 ## Run the demo
 
-After the immutable public demo refs have been published, run:
+Run:
 
 ```console
 uv run demo.py
