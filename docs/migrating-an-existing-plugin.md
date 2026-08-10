@@ -231,6 +231,7 @@ contributions:
 One plugin-wide `worker_package` applies to every declared environment.
 Do not repeat it per environment or duplicate its dependencies in the inner `pyproject.toml`.
 The path is relative to the directory containing `napari.yaml`, and it must identify the embedded project containing `pyproject.toml`.
+Give the embedded distribution a name that does not collide with any declared Conda or PyPI dependency.
 
 The `python_name` target is imported in the selected worker environment, not in napari's process.
 Installing the outer plugin wheel only makes that embedded project available; startup reconciliation installs it and the declared worker dependencies into each required environment.
@@ -280,6 +281,11 @@ Do not duplicate a scrolling environment log in each plugin widget.
 Tell the user to restart napari to retry setup.
 `PluginWorkerError` reports execution or transport failures and may contain a structured remote traceback, exception type, worker process, exit code, signal, timeout, or serialization context.
 
+Commands sharing an environment run one at a time in submission order.
+Canceling queued work is immediate, while canceling running work is cooperative and completes only after the target returns from its current call.
+A remote exception normally leaves the warm worker usable, but a fatal worker or transport failure stops it and fails queued commands without replaying them.
+Worker commands are never retried automatically; offer an explicit retry only when repeating the operation is safe.
+
 ## 6. Account for the restart lifecycle
 
 Package and enablement changes take effect after restart.
@@ -295,6 +301,9 @@ Later commands reuse the warm worker until the user stops it or napari exits.
 
 Describe large downloads and expected first-run costs in the plugin release notes.
 When worker source or an environment recipe changes, release a new plugin version and expect napari to rebuild the affected environment at startup.
+
+Treat the migrated plugin and every worker dependency as trusted code.
+A managed environment prevents dependency conflicts but does not restrict operating-system permissions, file access, or network access.
 
 ## 7. Validate the built wheel
 
@@ -322,6 +331,7 @@ Do not publish a migrated plugin against unreleased APIs as though they were sta
 - [ ] Add one dependency-free embedded worker project only when adapter targets are needed.
 - [ ] Include the manifest and worker project in the built wheel.
 - [ ] Declare worker dependencies once in manifest environments.
+- [ ] Check that Python, Conda, PyPI, direct-reference, and channel declarations use schema 0.3's supported forms.
 - [ ] Give every worker command a qualified target and same-plugin environment.
 - [ ] Add `host_dependency_policy: napari` only after the host contract is satisfied.
 - [ ] Present command progress, cancellation, completion, and concise failures in the widget.

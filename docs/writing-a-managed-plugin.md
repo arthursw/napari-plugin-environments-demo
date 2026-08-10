@@ -123,6 +123,7 @@ py-modules = ["napari_threshold_worker"]
 
 The empty dependency list is intentional.
 The manifest is the single authoritative declaration of worker runtime dependencies, so the inner project must not declare runtime, optional, or dynamic dependencies.
+Its distribution name must also differ from every Conda and PyPI dependency declared by the plugin.
 
 The distribution name only identifies the inner build artifact.
 Because the project has no `napari.manifest` entry point, napari does not discover it as a second plugin.
@@ -219,8 +220,12 @@ It must point to the embedded Python project containing its own `pyproject.toml`
 The command's `python_name` is resolved inside the selected worker environment; napari does not import that target in the host process.
 
 Use `conda` for Conda requirements, `pypi` for Python package requirements, and `channels` for Conda channel order.
-Do not declare the same distribution in both dependency lists.
-The `python` field is a PEP 440 specifier such as `==3.10.*`.
+The `python` field accepts comma-separated PEP 440 clauses using `==`, `!=`, `>=`, `<=`, `>`, or `<`, such as `==3.10.*`; `~=` and `===` are not supported.
+Conda entries use a package name followed only by those comparison operators, and the interpreter belongs in the top-level `python` field rather than the `conda` list.
+PyPI entries use PEP 508 requirements without environment markers.
+Direct PyPI references are limited to credential-free `git+https` URLs pinned to a complete 40-character commit hash, with no query or fragment.
+Channels must be named channels rather than URLs, and `conda-forge` is used when `channels` is omitted.
+Declare each distribution at most once in an environment and never in both dependency lists.
 
 Schema 0.3 deliberately has one plugin-wide `worker_package` and no per-environment local-package or lockfile fields.
 Napari identifies worker content when deciding whether the persistent environment can be reused.
@@ -290,6 +295,21 @@ When napari's Qt application is running, callbacks are dispatched on the GUI thr
 Keep progress and cancellation beside the action that started the worker command.
 Use **Plugins > Manage Plugin Environments...** for shared setup and worker diagnostics rather than adding a scrolling environment log to every plugin widget.
 
+## Understand queues, cancellation, and failures
+
+Once started, each environment owns one persistent worker process, and commands using that environment run one at a time in submission order.
+Different environments can run work concurrently.
+
+`task.cancel()` returns whether the request was accepted.
+Canceling a queued task removes it from the queue and completes it as canceled without starting the worker call.
+Canceling a running task sets the worker cancellation flag exposed as `napari_context.cancel_requested`; the target must return from its current Python or third-party call before cancellation can complete.
+Cancellation is therefore cooperative and does not forcibly interrupt a blocking library call, although a result produced after cancellation was requested is discarded.
+
+An unavailable environment produces an already-failed task, so always attach a done callback and inspect its terminal state.
+Remote exceptions and serialization errors fail only their task and normally leave the worker reusable.
+A fatal transport error or dead worker stops that worker and fails its queued tasks without replaying them; a later submission starts a fresh worker after cleanup completes.
+Napari never retries a worker command automatically, so plugin code should offer an explicit retry only when repeating the operation is safe.
+
 ## Pass arrays through automatic shared-memory transport
 
 Plugin code passes NumPy arrays directly to `execute_worker_command()` and returns arrays directly from the worker target.
@@ -319,8 +339,9 @@ Arguments and results can contain:
 - NumPy arrays without object dtype or dtype metadata and within transport limits.
 
 Arrays nested inside supported lists, tuples, and dictionaries use the same automatic shared-memory transport.
-Non-contiguous arrays become C-contiguous copies, empty arrays need no shared-memory allocation, and one array must fit within the operating system's shared-memory limits.
+Non-contiguous arrays become C-contiguous copies, empty arrays need no shared-memory allocation, arrays may have at most 64 dimensions, and one array must fit within the operating system's shared-memory limits.
 Both the napari process and worker environment need NumPy; napari already provides it to the host, so declare it in every managed environment that receives or returns arrays.
+Cyclic containers are rejected.
 
 Do not pass viewers, layers, widgets, Qt objects, generators, arbitrary class instances, open files, or callables.
 Extract arrays and ordinary metadata in host code, then reconstruct or update napari objects after completion.
