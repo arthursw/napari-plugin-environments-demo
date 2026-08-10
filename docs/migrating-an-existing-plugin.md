@@ -111,6 +111,8 @@ def run(self) -> None:
 The worker imports Cellpose without importing napari or Qt:
 
 ```python
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -228,6 +230,10 @@ contributions:
 
 One plugin-wide `worker_package` applies to every declared environment.
 Do not repeat it per environment or duplicate its dependencies in the inner `pyproject.toml`.
+The path is relative to the directory containing `napari.yaml`, and it must identify the embedded project containing `pyproject.toml`.
+
+The `python_name` target is imported in the selected worker environment, not in napari's process.
+Installing the outer plugin wheel only makes that embedded project available; startup reconciliation installs it and the declared worker dependencies into each required environment.
 
 Split environments according to real dependency incompatibilities, not individual function calls.
 Commands sharing one compatible dependency set can share one environment and warm worker.

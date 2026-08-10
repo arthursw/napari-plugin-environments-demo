@@ -50,6 +50,11 @@ The inner project is not another napari plugin and is not published separately.
 It needs no manifest, entry point, README, `__init__.py`, or additional `src` directory for a single-module worker.
 Napari installs it into each environment declared by the plugin, but never into the environment running napari.
 
+The plugin author still builds and publishes one outer wheel.
+That wheel contains the lightweight host package, the manifest, and the inner worker project as package data.
+Installing the outer wheel makes the worker source available to napari but does not install its worker dependencies into the napari environment.
+During startup reconciliation, napari uses the manifest to build each isolated environment and installs both its declared dependencies and the embedded worker project there.
+
 Omit the embedded project when every worker target is already provided by a package declared in the environment recipe.
 
 ## Configure the outer plugin package
@@ -150,7 +155,7 @@ def threshold(
     value = parameters["threshold"]
     labels = (np.asarray(image) > value).astype(np.uint8)
 
-    napari_context.update("Returning labels", current=1, maximum=2)
+    napari_context.update("Returning labels", current=2, maximum=2)
     if napari_context.cancel_requested:
         return None
 
@@ -208,6 +213,10 @@ contributions:
 `host_dependency_policy: napari` opts into the host dependency contract.
 Environment and isolated-command identifiers must begin with the manifest name and are unique under case-insensitive comparison.
 A worker command can reference only an environment declared by the same plugin.
+
+`worker_package: worker` is a path relative to the directory containing `napari.yaml`.
+It must point to the embedded Python project containing its own `pyproject.toml`.
+The command's `python_name` is resolved inside the selected worker environment; napari does not import that target in the host process.
 
 Use `conda` for Conda requirements, `pypi` for Python package requirements, and `channels` for Conda channel order.
 Do not declare the same distribution in both dependency lists.
