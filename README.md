@@ -62,10 +62,10 @@ The safe managed installation path is reserved for one immutable, validated whee
 
 ## Inspect and stop workers
 
-Open **Plugins > Managed Plugin Workers...** to inspect environment status and logs.
+Open **Plugins > Manage Plugin Environments...** to inspect environment status and logs.
 Worker processes start only when a command first needs them, so startup does not import heavy libraries or reserve worker memory.
 Napari keeps each process alive after the command completes, which makes later calls faster because the process and imported model libraries can be reused.
-Use **Stop** on an idle worker to release that memory; the next command starts a fresh worker in the already installed environment.
+Use **Stop worker** on an idle worker to release that memory; the next command starts a fresh worker in the already installed environment.
 
 ## Try a legacy catalog plugin
 
