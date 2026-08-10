@@ -37,13 +37,12 @@ def reconcile_startup(manager: PluginEnvironmentManager) -> None:
     manager.start_reconciliation().result(timeout=900)
 
 
-def main() -> None:
+def _run_smoke(root: Path) -> None:
     npe2.PluginManager.instance().discover(include_npe1=False)
     host_pid = os.getpid()
     host_numpy = np.__version__
     image = np.arange(64, dtype=np.float32).reshape(8, 8) / 63
     progress: list[str] = []
-    root = Path(tempfile.gettempdir()) / 'napari-plugin-environments-demo'
     manager = PluginEnvironmentManager(root=root)
     _set_plugin_environment_manager(manager)
 
@@ -124,6 +123,13 @@ def main() -> None:
     print(f'Host NumPy: {host_numpy}')
     print('Worker NumPy versions: 1.26.4 and 2.2.6')
     print('Reuse, transport, progress, cancellation, and failure: OK')
+
+
+def main() -> None:
+    with tempfile.TemporaryDirectory(
+        prefix='napari-plugin-environments-demo-'
+    ) as directory:
+        _run_smoke(Path(directory))
 
 
 if __name__ == '__main__':
