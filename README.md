@@ -8,6 +8,14 @@ The repository includes a small plugin that runs the same operation with incompa
 WSegmenter is installed separately from its own GitHub repository as a realistic integration using Cellpose, StarDist, and SAM 2.
 The prototype and demo were generated with GPT-5.6 Sol and reviewed with automated tests and manual use.
 
+## Plugin author documentation
+
+- [Write a plugin with managed environments](docs/writing-a-managed-plugin.md) explains the host/worker split, embedded worker project, manifest declarations, task API, lifecycle, and validation.
+- [Migrate an existing plugin](docs/migrating-an-existing-plugin.md) gives a step-by-step dependency and code migration checklist.
+- [Plugin Manager prototype documentation](https://github.com/arthursw/napari-plugin-manager/blob/8e09dcff6c3435a5e5c17f36d8af4c481bad1289/README.md) explains conflict-safe catalog installation, warnings for legacy plugins, and restart behavior.
+
+These pages document the prototype demonstrated by this repository, not released napari APIs.
+
 ## Run the demo
 
 Run:
