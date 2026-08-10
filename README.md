@@ -8,14 +8,6 @@ The repository includes a small plugin that runs the same operation with incompa
 WSegmenter is installed separately from its own GitHub repository as a realistic integration using Cellpose, StarDist, and SAM 2.
 The prototype and demo were generated with GPT-5.6 Sol and reviewed with automated tests and manual use.
 
-Three separate lifecycle steps make this model work:
-
-1. The lightweight plugin package is installed into napari and contributes its widgets and manifest.
-2. At the next napari startup, each declared dependency environment is installed or reused before its commands become available.
-3. When a command is first invoked, napari starts its worker process lazily and keeps that process available for later calls.
-
-An installed environment is therefore persistent on disk, while a worker is a process that can be stopped and restarted without reinstalling that environment.
-
 ## Plugin author documentation
 
 - [Write a plugin with managed environments](docs/writing-a-managed-plugin.md) explains the host/worker split, embedded worker project, manifest declarations, task API, lifecycle, and validation.
