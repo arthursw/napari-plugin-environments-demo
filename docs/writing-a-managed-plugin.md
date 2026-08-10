@@ -6,6 +6,7 @@
 
 Managed environments let a plugin keep its napari and Qt integration in the napari process while dependency-sensitive computation runs in an isolated worker process.
 Each plugin owns its environment recipes, while napari owns provisioning, worker processes, progress, cancellation, failures, reuse, and shutdown.
+NumPy array data crosses the process boundary automatically through operating-system shared memory, while plugin functions continue to receive and return ordinary `numpy.ndarray` objects.
 
 The [minimal isolation plugin](../plugins/napari-isolation-demo/) demonstrates the complete pattern with incompatible NumPy versions.
 [WSegmenter](https://github.com/arthursw/napari-wsegmenter/tree/demo/plugin-environments) applies the same pattern to Cellpose, StarDist, and SAM 2.
@@ -280,6 +281,25 @@ When napari's Qt application is running, callbacks are dispatched on the GUI thr
 Keep progress and cancellation beside the action that started the worker command.
 Use **Plugins > Manage Plugin Environments...** for shared setup and worker diagnostics rather than adding a scrolling environment log to every plugin widget.
 
+## Pass arrays through automatic shared-memory transport
+
+Plugin code passes NumPy arrays directly to `execute_worker_command()` and returns arrays directly from the worker target.
+It does not allocate shared memory, serialize array bytes, pass shared-memory names, or release transport resources.
+
+Underneath that ordinary Python API, napari's Wetlands backend transports array data out of band:
+
+1. The sending process copies the array into an operating-system shared-memory segment and sends a small descriptor containing its shape, dtype, and segment identity.
+2. The receiving process attaches to the segment and copies its contents into a writable, C-contiguous `numpy.ndarray` owned by that process.
+3. The receiver acknowledges the transfer, and the process that created the segment closes and unlinks it.
+
+Results use the same mechanism in the opposite direction.
+The host receives an independently owned array before the worker-owned segment is released, so the result remains valid after the task or worker pool ends.
+Mutating a worker input does not mutate the caller's original array.
+
+This is automatic shared-memory **transport**, not shared mutable array ownership and not an end-to-end zero-copy API.
+The copies give plugin code simple ownership semantics while keeping large array bytes out of the normal control-message serialization path.
+Wetlands owns the segment leases and cleans them up after completion, cancellation, timeout, dispatch failure, disconnection, or worker death.
+
 ## Pass supported values
 
 Arguments and results can contain:
@@ -288,6 +308,10 @@ Arguments and results can contain:
 - lists and tuples containing supported values;
 - dictionaries with supported scalar keys and supported values;
 - NumPy arrays without object dtype or dtype metadata and within transport limits.
+
+Arrays nested inside supported lists, tuples, and dictionaries use the same automatic shared-memory transport.
+Non-contiguous arrays become C-contiguous copies, empty arrays need no shared-memory allocation, and one array must fit within the operating system's shared-memory limits.
+Both the napari process and worker environment need NumPy; napari already provides it to the host, so declare it in every managed environment that receives or returns arrays.
 
 Do not pass viewers, layers, widgets, Qt objects, generators, arbitrary class instances, open files, or callables.
 Extract arrays and ordinary metadata in host code, then reconstruct or update napari objects after completion.

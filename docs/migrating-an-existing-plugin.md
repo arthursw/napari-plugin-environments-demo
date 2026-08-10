@@ -139,6 +139,11 @@ def segment_cellpose(
 
 Do not pass the viewer, layer, widget, Qt values, arbitrary objects, generators, files, or callables to the worker.
 
+Pass NumPy arrays directly rather than introducing transport-specific types.
+Wetlands automatically copies each array into an operating-system shared-memory segment, sends its descriptor, and reconstructs an independently owned array on the receiving side.
+Results follow the same path back to the host, and Wetlands releases the segments after acknowledgement or terminal cleanup.
+This copy-in/copy-out design keeps array bytes out of control messages, ensures worker mutation cannot alter the caller's input, and leaves returned arrays valid after worker cleanup.
+
 ## 3. Add one embedded worker project
 
 Most existing plugins need a small adapter between ordinary values and a third-party library.
@@ -307,7 +312,7 @@ Do not publish a migrated plugin against unreleased APIs as though they were sta
 - [ ] Inventory host, worker, and development dependencies.
 - [ ] Keep every napari and Qt interaction in host code.
 - [ ] Move every additional runtime import and its computation to worker code.
-- [ ] Exchange only supported ordinary values and NumPy arrays.
+- [ ] Exchange only supported ordinary values and NumPy arrays, relying on automatic shared-memory array transport instead of transport-specific code.
 - [ ] Add one dependency-free embedded worker project only when adapter targets are needed.
 - [ ] Include the manifest and worker project in the built wheel.
 - [ ] Declare worker dependencies once in manifest environments.

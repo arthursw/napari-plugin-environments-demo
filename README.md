@@ -39,6 +39,7 @@ If every environment is current, startup remains silent.
 
 The plugin is installed only once in napari, but each command runs with its declared NumPy version in a separate process.
 Images, labels, and ordinary nested Python values cross the process boundary without exposing transport code to the plugin widget.
+NumPy array data is copied through automatically managed operating-system shared memory, while plugin code receives ordinary independently owned arrays and never handles shared-memory resources.
 
 ## Install WSegmenter from Git
 
