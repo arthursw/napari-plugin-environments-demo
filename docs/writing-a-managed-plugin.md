@@ -10,6 +10,7 @@ NumPy array data crosses the process boundary automatically through operating-sy
 
 The [minimal isolation plugin](../plugins/napari-isolation-demo/) demonstrates the complete pattern with incompatible NumPy versions.
 [WSegmenter](https://github.com/arthursw/napari-wsegmenter/tree/demo/plugin-environments) applies the same pattern to Cellpose, StarDist, and SAM 2.
+If you are adapting an existing plugin, follow the shorter [migration guide](migrating-an-existing-plugin.md) and use this page as the complete reference.
 
 ## Separate host code from worker code
 
@@ -359,7 +360,7 @@ Skipped environments are retried at the next launch if their plugin remains enab
 
 Calling `execute_worker_command()` never installs, repairs, rebuilds, or removes an environment.
 The first command for a ready environment starts a worker lazily; later commands reuse that warm process.
-The **Plugin Environments** window can stop an idle worker without deleting its persistent environment.
+**Plugins > Manage Plugin Environments...** can stop an idle worker without deleting its persistent environment.
 Napari closes every owned worker and transport resource during application shutdown.
 
 Environment data is stored below napari's platform-specific user-data directory in `plugin-environments/installations/<hash-of-sys.prefix>/` so independent napari installations do not reconcile one another's environments.

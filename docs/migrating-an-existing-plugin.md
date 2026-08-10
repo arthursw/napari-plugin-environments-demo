@@ -17,7 +17,8 @@ Classify every runtime import, including imports inside functions and imports pe
 
 | Dependency | Destination |
 | --- | --- |
-| Python standard library, napari, and direct base requirements of napari | Host package; declare every package imported directly |
+| Python standard library and the plugin's own host modules | Host package; no external dependency declaration |
+| napari and direct base requirements of napari | Host package; declare every third-party distribution imported directly |
 | Every other runtime package, regardless of size | Managed environment and worker code |
 | pytest, linters, documentation tools, and other development tools | Development or testing dependency group |
 
@@ -274,7 +275,7 @@ def _on_done(self, task) -> None:
         self.status.setText(str(task.error or "Worker failed"))
 ```
 
-Use the shared **Plugin Environments** window for detailed setup and worker logs.
+Use **Plugins > Manage Plugin Environments...** for detailed setup and worker logs.
 Do not duplicate a scrolling environment log in each plugin widget.
 
 `PluginEnvironmentUnavailableError` means startup did not make the command's environment available for this session.
