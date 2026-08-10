@@ -26,7 +26,7 @@ These pages document the prototype demonstrated by this repository, not released
 
 ## Run the demo
 
-Run:
+Download `demo.py` or clone this repo, and run:
 
 ```console
 uv run demo.py
@@ -48,6 +48,13 @@ If every environment is current, startup remains silent.
 The plugin is installed only once in napari, but each command runs with its declared NumPy version in a separate process.
 Images, labels, and ordinary nested Python values cross the process boundary without exposing transport code to the plugin widget.
 NumPy array data is copied through automatically managed operating-system shared memory, while plugin code receives ordinary independently owned arrays and never handles shared-memory resources.
+
+## Inspect and stop workers
+
+Open **Plugins > Manage Plugin Environments...** to inspect environment status and logs.
+Worker processes start only when a command first needs them, so startup does not import heavy libraries or reserve worker memory.
+Napari keeps each process alive after the command completes, which makes later calls faster because the process and imported model libraries can be reused.
+Use **Stop worker** on an idle worker to release that memory; the next command starts a fresh worker in the already installed environment.
 
 ## Install WSegmenter from Git
 
@@ -76,13 +83,6 @@ The widgets and napari integration remain lightweight host code, while the heavy
 The installation is called unmanaged because a Git requirement asks pip to build source and perform normal dependency resolution.
 This warning concerns the installation path, not WSegmenter's worker isolation design.
 The safe managed installation path is reserved for one immutable, validated wheel obtained from the plugin catalog.
-
-## Inspect and stop workers
-
-Open **Plugins > Manage Plugin Environments...** to inspect environment status and logs.
-Worker processes start only when a command first needs them, so startup does not import heavy libraries or reserve worker memory.
-Napari keeps each process alive after the command completes, which makes later calls faster because the process and imported model libraries can be reused.
-Use **Stop worker** on an idle worker to release that memory; the next command starts a fresh worker in the already installed environment.
 
 ## Try a legacy catalog plugin
 
@@ -123,6 +123,10 @@ Continuing is a session-only decision.
 If the plugin remains enabled and its environment still cannot be installed, napari presents the failure again at the next startup.
 To stop retrying, uninstall or disable the affected plugin in the Plugin Manager and restart napari; startup then removes its orphaned managed environments.
 
+## Managed plugin environments storage
+
+Managed plugin environments are stored in napari's platform-specific user-data directory under `plugin-environments/installations/<hash-of-sys.prefix>/`, so independent napari installations cannot reconcile or remove one another's environments.
+
 ## Run the automated check
 
 Close the interactive demo first, then run:
@@ -134,19 +138,3 @@ uv run smoke.py
 The smoke test verifies incompatible dependencies, separate and reusable workers, arrays and nested values, progress, cancellation, structured failures, and an unchanged host environment.
 
 Managed environments provide dependency isolation, not a security sandbox.
-
-## Troubleshoot an early cached demo version
-
-An early revision briefly used numeric Git tags that `setuptools-scm` interpreted as package version `1`.
-Those tags have been deleted, but uv may retain them if it resolved that revision before the correction.
-
-Close napari and any running demo, then force uv to refresh the Git dependencies:
-
-```console
-uv run --refresh demo.py
-```
-
-Later launches can use the normal `uv run demo.py` command again.
-Fresh clones that never resolved the early tagged revision do not need this cleanup.
-
-Managed plugin environments are stored in napari's platform-specific user-data directory under `plugin-environments/installations/<hash-of-sys.prefix>/`, so independent napari installations cannot reconcile or remove one another's environments.
