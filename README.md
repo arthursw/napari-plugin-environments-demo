@@ -25,7 +25,7 @@ If every environment is current, startup remains silent.
 
 ## Try dependency isolation
 
-1. Open **Plugins > Isolation Demo > Dependency isolation demo**.
+1. Open **Plugins > Threshold (Isolation Demo)**.
 2. Select **NumPy 1.26**, then run the threshold operation.
 3. Select **NumPy 2.2** and run the same operation again.
 
@@ -82,7 +82,13 @@ Napari therefore keeps one immutable snapshot while it is running and asks for a
 At the next startup, it installs or rebuilds every environment required by the new snapshot, removes environments left by uninstalled plugins, and shows one progress dialog when that work changes disk state.
 
 Supporting those changes in a running process would require coordinating package installation, environment replacement and removal, active workers, queued and running commands, cancellation, rollback, and plugin discovery at the same time.
-The restart boundary deliberately avoids those concurrency cases and makes the guarantee understandable: commands run only after one complete startup reconciliation has succeeded.
+An earlier version of this prototype provided a **Managed Environments** window that could install, remove, rebuild, and stop environments while napari was running.
+That design had to remain correct when, for example, a user closed the window during an installation, started a command while its environment was being removed, canceled one operation while another was queued, or updated a plugin with workers still active.
+Handling every interleaving required a disproportionate amount of lifecycle and concurrency code for this demo.
+
+Napari could eventually support live environment management, but its ownership model and user experience should be discussed and designed by the napari community first.
+This demo therefore keeps the smaller **Plugin Environments** window for status, logs, and stopping idle workers, but deliberately provides no install, remove, or rebuild controls during a session.
+The restart boundary makes the guarantee understandable: commands run only after one complete startup reconciliation has succeeded.
 
 ## If environment setup fails
 
@@ -121,3 +127,5 @@ uv run --refresh demo.py
 
 Later launches can use the normal `uv run demo.py` command again.
 Fresh clones that never resolved the early tagged revision do not need this cleanup.
+
+Managed plugin environments are stored in napari's platform-specific user-data directory under `plugin-environments/installations/<hash-of-sys.prefix>/`, so independent napari installations cannot reconcile or remove one another's environments.

@@ -37,8 +37,8 @@ contributions:
       python_name: napari_isolation_worker:fail_operation
       environment: napari-isolation-demo.numpy2
     - id: napari-isolation-demo.make_widget
-      title: Make isolation demo widget
+      title: Create threshold widget
       python_name: napari_isolation_demo:IsolationDemoWidget
   widgets:
     - command: napari-isolation-demo.make_widget
-      display_name: Dependency isolation demo
+      display_name: Threshold

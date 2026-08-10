@@ -168,7 +168,7 @@ class IsolationDemoWidget(QWidget):
         if notify:
             from napari.utils.notifications import show_error
 
-            show_error(f'Dependency isolation demo failed: {details}')
+            show_error(f'Threshold failed: {details}')
 
     def _set_busy(self, busy: bool) -> None:
         self.environment.setEnabled(not busy)

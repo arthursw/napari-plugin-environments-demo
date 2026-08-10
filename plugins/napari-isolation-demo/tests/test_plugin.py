@@ -85,6 +85,7 @@ def test_manifest_declares_two_environments_with_one_worker_project() -> None:
         if command.environment is not None
     ]
     assert all(command.accepts_worker_context for command in worker_commands)
+    assert manifest.contributions.widgets[0].display_name == 'Threshold'
     manifest.validate_environment_resources()
 
 
