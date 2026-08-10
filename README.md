@@ -92,6 +92,10 @@ The restart boundary makes the guarantee understandable: commands run only after
 
 ## If environment setup fails
 
+While installation is running, choose **Cancel setup and continue** to stop the complete startup setup pass.
+Napari waits for the active provisioning process to stop and removes its incomplete environment before opening the main application; all environments that were not prepared remain unavailable for that session.
+You can then disable or uninstall the unwanted plugin and restart napari, or leave it enabled and retry setup at the next launch.
+
 The startup dialog offers three choices:
 
 - **Retry** cleans up the incomplete environment and attempts a clean installation again.
