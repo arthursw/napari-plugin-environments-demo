@@ -46,10 +46,10 @@ Install the demo source through the Plugin Manager's explicitly unmanaged path:
 
 3. Start the installation and accept the unmanaged-install warning.
 4. Close the Plugin Manager and observe the restart prompt.
-5. Close napari, then restart the existing script environment without synchronizing away the newly installed plugin:
+5. Close napari, then launch the demo again:
 
    ```console
-   uv run --no-sync demo.py
+   uv run demo.py
    ```
 
 The startup dialog installs WSegmenter's three declared environments before its commands become available.
